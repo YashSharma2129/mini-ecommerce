@@ -129,11 +129,10 @@ const getMe = async (req, res) => {
   }
 };
 
-// Apply rate limiter to login route
-exports.loginLimiter = loginLimiter;
-
+// Export all functions as named exports
 module.exports = {
   register,
   login,
-  getMe
+  getMe,
+  loginLimiter
 };
