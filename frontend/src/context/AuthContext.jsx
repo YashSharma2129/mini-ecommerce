@@ -79,13 +79,24 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, userData);
+      console.log('Attempting registration...');
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, userData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true
+      });
       localStorage.setItem('token', response.data.token);
       setUser(response.data.user);
       toast.success('Registration successful');
       return true;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Registration failed');
+      console.error('Registration error:', error);
+      if (error.code === 'ERR_NETWORK') {
+        toast.error('Network error - Please check your connection or disable ad blockers');
+      } else {
+        toast.error(error.response?.data?.message || 'Registration failed');
+      }
       return false;
     }
   };
