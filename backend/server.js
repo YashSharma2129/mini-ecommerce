@@ -32,10 +32,11 @@ process.on('unhandledRejection', (err) => {
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production'
         ? ['https://mini-ecommerce-yash.netlify.app']
-        : ['http://localhost:3000'],
+        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
