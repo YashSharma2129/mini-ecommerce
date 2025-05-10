@@ -115,6 +115,8 @@ A professional full-stack e-commerce platform demonstrating modern web developme
 ### Backend Deployment (Railway)
 
 1. The backend is deployed on Railway with the following details:
+   - Production URL: `https://mini-ecommerce-production.up.railway.app`
+   - API Base URL: `https://mini-ecommerce-production.up.railway.app/api`
    - Internal URL: `mini-ecommerce.railway.internal`
    - Private networking enabled for secure communication
 
@@ -127,7 +129,7 @@ A professional full-stack e-commerce platform demonstrating modern web developme
 
 2. Environment variables on Netlify:
    ```
-   REACT_APP_API_URL=https://mini-ecommerce.railway.app/api
+   REACT_APP_API_URL=https://mini-ecommerce-production.up.railway.app/api
    ```
 
 ## Project Structure
