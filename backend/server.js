@@ -27,7 +27,6 @@ process.on('unhandledRejection', (err) => {
   }
 });
 
-// ✅ Proper dynamic CORS configuration
 const allowedOrigins = [
   'https://mini-ecommerce-yash.netlify.app',
   'https://mini-ecommerce-production.up.railway.app',
@@ -37,7 +36,6 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (e.g., Postman) or from allowed domains
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -58,11 +56,9 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
 
-// Error Handling
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`);

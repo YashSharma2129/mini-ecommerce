@@ -19,7 +19,7 @@ const ProductDetails = () => {
   const fetchProduct = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/products/${id}`);
-      setProduct(response.data);
+      setProduct(response.data.data);
       setLoading(false);
     } catch (error) {
       toast.error('Error loading product');
@@ -43,22 +43,32 @@ const ProductDetails = () => {
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg animate-fade-in">
       <div className="grid md:grid-cols-2 gap-8">
         {/* Image Section */}
-        <div className="relative aspect-square rounded-xl overflow-hidden">
+        <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
           <img 
-            src={product.imageUrl || 'https://via.placeholder.com/400'} 
-            alt={product.name}
-            className="w-full h-full object-cover"
+            src={product?.imageUrl || 'https://via.placeholder.com/400'} 
+            alt={product?.name}
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              e.target.onerror = null; // Prevent infinite loop
+              e.target.src = 'https://via.placeholder.com/400';
+            }}
           />
         </div>
 
         {/* Details Section */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{product.name}</h1>
-            <p className="text-lg text-primary mt-2">${Number(product.price).toFixed(2)}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {product?.name || 'Loading...'}
+            </h1>
+            <p className="text-lg text-primary mt-2">
+              ${(product?.price || 0).toFixed(2)}
+            </p>
           </div>
 
-          <p className="text-gray-600 dark:text-gray-300">{product.description}</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            {product?.description || 'No description available'}
+          </p>
 
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
@@ -74,10 +84,10 @@ const ProductDetails = () => {
             </div>
 
             <button 
-              onClick={() => addToCart(product, quantity)}
+              onClick={handleAddToCart}
               className="w-full py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-600 transition-colors"
             >
-              Add to Cart - ${(Number(product.price) * quantity).toFixed(2)}
+              Add to Cart - ${((product?.price || 0) * quantity).toFixed(2)}
             </button>
           </div>
 

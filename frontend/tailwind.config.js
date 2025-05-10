@@ -53,7 +53,7 @@ module.exports = {
         'warm': '0 4px 20px -2px rgba(0, 0, 0, 0.1), 0 0 10px -2px rgba(255, 107, 0, 0.1)',
       },
       screens: {
-        'xs': '475px',
+        'xs': '375px',
       }
     }
   },

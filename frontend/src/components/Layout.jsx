@@ -113,7 +113,7 @@ const Layout = ({ children, showHero = false, onSearch = () => {} }) => {
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center max-w-3xl mx-auto">
               <div className="inline-block animate-bounce mb-4">
-                <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium bg-primary/10 text-primary dark:text-primary-foreground">
+                <span className="inline-flex items-center px-2 sm:px-4 py-1 sm:py-2 rounded-full text-[10px] xs:text-xs sm:text-sm font-medium bg-primary/10 text-primary dark:text-primary-foreground whitespace-normal sm:whitespace-nowrap text-center">
                   ✨ Welcome! Start exploring our products
                 </span>
               </div>

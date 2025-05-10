@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
-import { useWishlist } from '../context/WishlistContext';
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -10,8 +9,6 @@ const ProductCard = ({ product }) => {
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
-  const isInWishlist = wishlistItems.some(item => item._id === product._id);
 
   const handleQuickView = () => {
     navigate(`/product/${product._id}`);
@@ -26,25 +23,6 @@ const ProductCard = ({ product }) => {
       toast.success('Added to cart!');
     } catch (error) {
       toast.error('Failed to add to cart');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleWishlistClick = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsLoading(true);
-    try {
-      if (isInWishlist) {
-        await removeFromWishlist(product._id);
-        toast.success('Removed from wishlist');
-      } else {
-        await addToWishlist(product._id);
-        toast.success('Added to wishlist');
-      }
-    } catch (error) {
-      toast.error('Failed to update wishlist');
     } finally {
       setIsLoading(false);
     }
@@ -102,18 +80,6 @@ const ProductCard = ({ product }) => {
           ))}
         </div>
       </div>
-
-      {/* Add Wishlist Button */}
-      <button
-        onClick={handleWishlistClick}
-        className="absolute top-2 right-2 p-2 bg-white/80 dark:bg-gray-800/80 rounded-full shadow-lg backdrop-blur-sm hover:scale-110 transition-transform"
-      >
-        <svg className={`w-5 h-5 ${isInWishlist ? 'text-red-500 fill-current' : 'text-gray-600 dark:text-gray-400'}`} 
-          stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-      </button>
     </div>
   );
 };

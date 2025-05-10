@@ -2,7 +2,6 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
-import { WishlistProvider } from './context/WishlistContext';
 import PrivateRoute from './components/PrivateRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
@@ -18,21 +17,19 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <CartProvider>
-          <WishlistProvider>
-            <Toaster position="top-right" />
-            <Routes>
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/" element={<Layout showHero={true}><ProductList /></Layout>} />
-              <Route path="/add-product" element={
-                <PrivateRoute>
-                  <Layout><AddProduct /></Layout>
-                </PrivateRoute>
-              } />
-              <Route path="/product/:id" element={<Layout><ProductDetails /></Layout>} />
-              <Route path="/order-confirmation" element={<Layout><OrderConfirmation /></Layout>} />
-            </Routes>
-          </WishlistProvider>
+          <Toaster position="top-right" />
+          <Routes>
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/" element={<Layout showHero={true}><ProductList /></Layout>} />
+            <Route path="/add-product" element={
+              <PrivateRoute>
+                <Layout><AddProduct /></Layout>
+              </PrivateRoute>
+            } />
+            <Route path="/product/:id" element={<Layout><ProductDetails /></Layout>} />
+            <Route path="/order-confirmation" element={<Layout><OrderConfirmation /></Layout>} />
+          </Routes>
         </CartProvider>
       </AuthProvider>
     </ErrorBoundary>
