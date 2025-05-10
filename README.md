@@ -112,42 +112,22 @@ A professional full-stack e-commerce platform demonstrating modern web developme
 
 ## Deployment
 
-### Backend Deployment (Heroku)
+### Backend Deployment (Railway)
 
-1. Create a Heroku account and install Heroku CLI
-2. Login to Heroku:
-   ```bash
-   heroku login
-   ```
+1. The backend is deployed on Railway with the following details:
+   - Internal URL: `mini-ecommerce.railway.internal`
+   - Private networking enabled for secure communication
 
-3. Create a new Heroku app:
-   ```bash
-   heroku create your-app-name
-   ```
+### Frontend Deployment (Netlify)
 
-4. Set environment variables:
-   ```bash
-   heroku config:set MONGO_URI=your_production_mongodb_uri
-   heroku config:set JWT_SECRET=your_production_jwt_secret
-   heroku config:set NODE_ENV=production
-   ```
-
-5. Deploy the backend:
-   ```bash
-   git subtree push --prefix backend heroku main
-   ```
-
-### Frontend Deployment (Netlify/Vercel)
-
-1. Create a new project on Netlify/Vercel
-2. Set build settings:
+1. The frontend is deployed on Netlify:
+   - URL: https://mini-ecommerce-yash.netlify.app
    - Build command: `npm run build`
    - Publish directory: `build`
-   - Environment variables: Add `REACT_APP_API_URL`
 
-3. Deploy:
-   ```bash
-   npm run build
+2. Environment variables on Netlify:
+   ```
+   REACT_APP_API_URL=https://mini-ecommerce.railway.app/api
    ```
 
 ## Project Structure
