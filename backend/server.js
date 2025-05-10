@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-// Verify environment variables are loaded
+// Verify environment variables
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not defined in environment variables');
   process.exit(1);
@@ -19,49 +19,51 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Add this after connectDB();
+// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
-  // Prevent crash, but log the error
   if (process.env.NODE_ENV === 'development') {
     console.error(err.stack);
   }
 });
 
-// Middleware
+// ✅ Proper dynamic CORS configuration
+const allowedOrigins = [
+  'https://mini-ecommerce-yash.netlify.app',
+  'https://mini-ecommerce-production.up.railway.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
+
 const corsOptions = {
-    origin: process.env.NODE_ENV === 'production'
-        ? ['https://mini-ecommerce-yash.netlify.app', 'https://mini-ecommerce-production.up.railway.app']
-        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Access-Control-Allow-Origin'],
-    optionsSuccessStatus: 200
+  origin: function (origin, callback) {
+    // Allow requests with no origin (e.g., Postman) or from allowed domains
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200,
 };
 
-app.use(cors(corsOptions));
-
-// Add security headers
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin,Content-Type,Authorization');
-    next();
-});
-
+app.use(cors(corsOptions)); // ✅ Proper placement
 app.use(express.json());
 
 // Routes
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/auth', authRoutes); // Ensure this exactly matches frontend URL
+app.use('/api/auth', authRoutes);
 
 // Error Handling
 app.use(notFound);
 app.use(errorHandler);
 
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
