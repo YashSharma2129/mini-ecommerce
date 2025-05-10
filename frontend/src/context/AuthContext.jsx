@@ -7,10 +7,28 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [tokenRefreshTimer, setTokenRefreshTimer] = useState(null);
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    const setupTokenRefresh = () => {
+      if (tokenRefreshTimer) clearInterval(tokenRefreshTimer);
+      // Refresh token every 23 hours
+      const timer = setInterval(refreshToken, 23 * 60 * 60 * 1000);
+      setTokenRefreshTimer(timer);
+    };
+
+    if (user) {
+      setupTokenRefresh();
+    }
+
+    return () => {
+      if (tokenRefreshTimer) clearInterval(tokenRefreshTimer);
+    };
+  }, [user]);
 
   const checkAuth = async () => {
     try {
@@ -25,6 +43,21 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('token');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshToken = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No token found');
+
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/refresh`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      localStorage.setItem('token', response.data.token);
+    } catch (error) {
+      logout();
     }
   };
 
@@ -47,6 +80,8 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, userData);
+      localStorage.setItem('token', response.data.token);
+      setUser(response.data.user);
       toast.success('Registration successful');
       return true;
     } catch (error) {

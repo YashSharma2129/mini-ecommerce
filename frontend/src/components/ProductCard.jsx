@@ -2,20 +2,52 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
+  const isInWishlist = wishlistItems.some(item => item._id === product._id);
 
   const handleQuickView = () => {
     navigate(`/product/${product._id}`);
   };
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product, 1);
+    setIsLoading(true);
+    try {
+      await addToCart(product, 1);
+      toast.success('Added to cart!');
+    } catch (error) {
+      toast.error('Failed to add to cart');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleWishlistClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsLoading(true);
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist(product._id);
+        toast.success('Removed from wishlist');
+      } else {
+        await addToWishlist(product._id);
+        toast.success('Added to wishlist');
+      }
+    } catch (error) {
+      toast.error('Failed to update wishlist');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -23,48 +55,38 @@ const ProductCard = ({ product }) => {
       onClick={handleQuickView}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 cursor-pointer h-full flex flex-col"
+      className="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 cursor-pointer h-full flex flex-col"
     >
       <div className="relative aspect-square overflow-hidden">
         <img 
-          src={product.imageUrl || 'https://via.placeholder.com/400'} 
+          src={!imageError ? product.imageUrl : 'https://via.placeholder.com/400'}
           alt={product.name}
+          onError={() => setImageError(true)}
+          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         
-        <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40 backdrop-blur-sm transition-opacity ${
+        <div className={`absolute inset-0 flex flex-col items-center justify-center gap-1 sm:gap-2 bg-black/40 backdrop-blur-sm transition-opacity ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}>
           <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAddToCart(e);
-            }}
-            className="w-4/5 py-2 bg-primary text-white rounded-full font-medium transform hover:scale-105 transition-all text-sm sm:text-base"
+            onClick={handleAddToCart}
+            disabled={isLoading}
+            className="w-4/5 py-1.5 sm:py-2 bg-primary text-white rounded-full font-medium transform hover:scale-105 transition-all text-xs sm:text-sm disabled:opacity-50"
           >
-            Add to Cart
+            {isLoading ? 'Adding...' : 'Add to Cart'}
           </button>
           <button 
             onClick={handleQuickView}
-            className="w-4/5 py-2 bg-white text-gray-900 rounded-full font-medium transform hover:scale-105 transition-all text-sm sm:text-base"
+            className="w-4/5 py-1.5 sm:py-2 bg-white text-gray-900 rounded-full font-medium transform hover:scale-105 transition-all text-xs sm:text-sm"
           >
             View Details
           </button>
         </div>
-
-        {/* Category Badge */}
-        <span className="absolute top-2 left-2 px-2 py-1 bg-black/50 backdrop-blur-sm text-white rounded-full text-xs">
-          {product.category}
-        </span>
-
-        {/* Price Badge */}
-        <div className="absolute bottom-2 right-2 px-3 py-1 bg-primary text-white rounded-full text-sm font-bold shadow-lg">
-          ${Number(product.price).toFixed(2)}
-        </div>
       </div>
 
-      <div className="p-3 sm:p-4 flex-1 flex flex-col">
-        <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-primary transition-colors">
+      <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col">
+        <h3 className="font-bold text-xs sm:text-sm md:text-base text-gray-900 dark:text-white mb-1 line-clamp-2">
           {product.name}
         </h3>
         <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm line-clamp-2 flex-1">
@@ -80,6 +102,18 @@ const ProductCard = ({ product }) => {
           ))}
         </div>
       </div>
+
+      {/* Add Wishlist Button */}
+      <button
+        onClick={handleWishlistClick}
+        className="absolute top-2 right-2 p-2 bg-white/80 dark:bg-gray-800/80 rounded-full shadow-lg backdrop-blur-sm hover:scale-110 transition-transform"
+      >
+        <svg className={`w-5 h-5 ${isInWishlist ? 'text-red-500 fill-current' : 'text-gray-600 dark:text-gray-400'}`} 
+          stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </button>
     </div>
   );
 };

@@ -16,13 +16,28 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Validate price
+      const price = Number(formData.price);
+      if (isNaN(price) || price <= 0) {
+        toast.error('Please enter a valid price');
+        return;
+      }
+
       // Remove empty imageUrl if not provided
       const submitData = { ...formData };
       if (!submitData.imageUrl) {
         delete submitData.imageUrl;
       }
 
-      await axios.post(`${process.env.REACT_APP_API_URL}/products`, submitData);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/products`, 
+        submitData,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
       toast.success('Product added successfully');
       navigate('/');
     } catch (error) {

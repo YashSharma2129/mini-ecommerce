@@ -1,36 +1,19 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true
-  },
-  address: {
-    type: String,
-    required: true
-  },
-  city: {
-    type: String,
-    required: true
-  },
-  postalCode: {
-    type: String,
-    required: true
-  },
-  phone: {
-    type: String,
-    required: true
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
   items: [{
-    _id: String,
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true
+    },
     name: String,
-    price: Number,
     quantity: Number,
-    imageUrl: String
+    price: Number
   }],
   totalAmount: {
     type: Number,
@@ -40,6 +23,17 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'processing', 'shipped', 'delivered'],
     default: 'pending'
+  },
+  shippingAddress: {
+    name: String,
+    address: String,
+    city: String,
+    postalCode: String,
+    phone: String
+  },
+  isGuestOrder: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

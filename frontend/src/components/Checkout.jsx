@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 const Checkout = ({ onClose }) => {
   const navigate = useNavigate();
   const { cartItems, cartTotal, clearCart } = useCart();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,6 +17,17 @@ const Checkout = ({ onClose }) => {
     phone: ''
   });
   const [loading, setLoading] = useState(false);
+
+  // Pre-fill form with user data if logged in
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || '',
+        email: user.email || ''
+      }));
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -47,27 +60,44 @@ const Checkout = ({ onClose }) => {
 
     setLoading(true);
     try {
+      // Format cart items to match the order schema
+      const formattedItems = cartItems.map(item => ({
+        productId: item._id,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      }));
+
+      const orderData = {
+        ...formData,
+        items: formattedItems,
+        totalAmount: cartTotal,
+        status: 'pending',
+        userId: user?._id
+      };
+
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(user && { Authorization: `Bearer ${localStorage.getItem('token')}` })
+      };
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/orders`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          items: cartItems,
-          totalAmount: cartTotal,
-          status: 'pending'
-        }),
+        headers,
+        body: JSON.stringify(orderData),
       });
 
-      if (!response.ok) throw new Error('Order submission failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Order submission failed');
+      }
 
       toast.success('Order placed successfully!');
       clearCart();
       onClose();
       navigate('/order-confirmation');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to place order');
+      toast.error(error.message || 'Failed to place order');
     } finally {
       setLoading(false);
     }
@@ -77,7 +107,21 @@ const Checkout = ({ onClose }) => {
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Checkout</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">Checkout</h2>
+            {!user && (
+              <div className="text-sm">
+                <span className="text-gray-600 dark:text-gray-400">Have an account? </span>
+                <button
+                  onClick={() => navigate('/signin')}
+                  className="text-primary hover:underline"
+                >
+                  Sign in
+                </button>
+              </div>
+            )}
+          </div>
+          
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

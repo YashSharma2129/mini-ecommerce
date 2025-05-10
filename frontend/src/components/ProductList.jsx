@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProductCard from './ProductCard';
 import SearchBar from './SearchBar';
+import { toast } from 'react-toastify';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -14,10 +15,11 @@ const ProductList = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/products`);
-      setProducts(response.data);
+      setProducts(response.data.data || []); // Handle new response format
       setLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
+      toast.error('Failed to fetch products');
       setLoading(false);
     }
   };
@@ -27,9 +29,10 @@ const ProductList = () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/products/search`, {
         params: { query, category }
       });
-      setProducts(response.data);
+      setProducts(response.data.data || []); // Handle new response format
     } catch (error) {
       console.error('Error searching products:', error);
+      toast.error('Search failed');
     }
   };
 

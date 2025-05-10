@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import CartDrawer from './CartDrawer';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const Layout = ({ children, showHero = false, onSearch = () => {} }) => {
   const location = useLocation();
   const { cartCount, isCartOpen, setIsCartOpen } = useCart();
+  const { user, logout } = useAuth();
   const [scrollY, setScrollY] = useState(0);
   const isHomePage = location.pathname === '/';
 
@@ -19,20 +21,37 @@ const Layout = ({ children, showHero = false, onSearch = () => {} }) => {
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center">
-              <Link to="/" className="text-lg sm:text-xl font-bold text-primary truncate">
+              <Link to="/" className="text-base sm:text-lg md:text-xl font-bold text-primary truncate">
                 Mini E-commerce
               </Link>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Link
-                to="/add-product"
-                className="px-3 sm:px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-600 transition-colors text-sm sm:text-base whitespace-nowrap"
-              >
-                Add Product
-              </Link>
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
+              {user ? (
+                <>
+                  <Link
+                    to="/add-product"
+                    className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base rounded-lg bg-primary text-white hover:bg-primary-600 transition-colors whitespace-nowrap"
+                  >
+                    Add Product
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/signin"
+                  className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base rounded-lg bg-primary text-white hover:bg-primary-600 transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
               <button 
                 onClick={() => setIsCartOpen(true)}
                 className="p-2 text-primary hover:bg-primary/10 rounded-full relative group"

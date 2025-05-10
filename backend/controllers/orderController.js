@@ -1,32 +1,35 @@
-const Order = require('../models/Order');
+const Order = require('../models/orderModel');
 
 // Create new order
-const createOrder = async (req, res) => {
-    try {
-        const order = await Order.create(req.body);
-        res.status(201).json(order);
-    } catch (error) {
-        res.status(400);
-        throw new Error(error.message);
-    }
+exports.createOrder = async (req, res) => {
+  try {
+    const orderData = {
+      ...req.body,
+      userId: req.user?._id || null,
+      isGuestOrder: !req.user
+    };
+
+    const order = await Order.create(orderData);
+    res.status(201).json(order);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };
 
 // Get order by ID
-const getOrderById = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id);
-        if (!order) {
-            res.status(404);
-            throw new Error('Order not found');
-        }
-        res.json(order);
-    } catch (error) {
-        res.status(error.kind === 'ObjectId' ? 404 : 500);
-        throw new Error(error.message);
+exports.getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
     }
-};
 
-module.exports = {
-    createOrder,
-    getOrderById
+    if (req.user?._id && order.userId && order.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    res.json(order);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };
