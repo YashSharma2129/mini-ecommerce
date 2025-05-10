@@ -13,6 +13,31 @@ const AddProduct = () => {
     category: ''
   });
 
+  // Using a lightweight SVG as default image
+  const defaultImage = `data:image/svg+xml,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+      <rect width="400" height="400" fill="#f3f4f6"/>
+      <text x="50%" y="50%" font-family="Arial" font-size="24" fill="#9ca3af" text-anchor="middle">
+        No Image Available
+      </text>
+    </svg>
+  `)}`;
+
+  const validateImageUrl = (url) => {
+    if (!url) return defaultImage;
+    try {
+      const parsedUrl = new URL(url);
+      // Accept http, https, and data URLs
+      if (!['http:', 'https:', 'data:'].includes(parsedUrl.protocol)) {
+        throw new Error('Invalid URL protocol');
+      }
+      return url;
+    } catch (error) {
+      toast.error('Please enter a valid image URL');
+      return defaultImage;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -23,13 +48,16 @@ const AddProduct = () => {
         return;
       }
 
-      // Remove empty imageUrl if not provided
-      const submitData = { ...formData };
-      if (!submitData.imageUrl) {
-        delete submitData.imageUrl;
-      }
+      // Validate and format image URL
+      const validatedImageUrl = validateImageUrl(formData.imageUrl);
+      
+      // Prepare submission data
+      const submitData = {
+        ...formData,
+        imageUrl: validatedImageUrl
+      };
 
-      const response = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_URL}/products`, 
         submitData,
         {
@@ -47,7 +75,12 @@ const AddProduct = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === 'imageUrl') {
+      // Strip any whitespace from image URLs
+      setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
   return (

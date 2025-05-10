@@ -11,6 +11,8 @@ import ProductDetails from './components/ProductDetails';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import OrderConfirmation from './components/OrderConfirmation';
+import TermsAndConditions from './pages/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
             } />
             <Route path="/product/:id" element={<Layout><ProductDetails /></Layout>} />
             <Route path="/order-confirmation" element={<Layout><OrderConfirmation /></Layout>} />
+            <Route path="/terms" element={<TermsAndConditions />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
           </Routes>
         </CartProvider>
       </AuthProvider>

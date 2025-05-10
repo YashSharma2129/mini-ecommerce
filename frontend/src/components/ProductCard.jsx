@@ -10,6 +10,22 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
+  // Using a lightweight SVG as placeholder
+  const placeholderImage = `data:image/svg+xml,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+      <rect width="400" height="400" fill="#f3f4f6"/>
+      <text x="50%" y="50%" font-family="Arial" font-size="24" fill="#9ca3af" text-anchor="middle">
+        No Image Available
+      </text>
+    </svg>
+  `)}`;
+
+  const handleImageError = (e) => {
+    setImageError(true);
+    e.target.src = placeholderImage;
+    e.target.onerror = null; // Prevent infinite loop
+  };
+
   const handleQuickView = () => {
     navigate(`/product/${product._id}`);
   };
@@ -35,13 +51,13 @@ const ProductCard = ({ product }) => {
       onMouseLeave={() => setIsHovered(false)}
       className="group bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 cursor-pointer h-full flex flex-col"
     >
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
         <img 
-          src={!imageError ? product.imageUrl : 'https://via.placeholder.com/400'}
+          src={!imageError ? (product.imageUrl || placeholderImage) : placeholderImage}
           alt={product.name}
-          onError={() => setImageError(true)}
+          onError={handleImageError}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
         />
         
         <div className={`absolute inset-0 flex flex-col items-center justify-center gap-1 sm:gap-2 bg-black/40 backdrop-blur-sm transition-opacity ${
@@ -69,6 +85,9 @@ const ProductCard = ({ product }) => {
         </h3>
         <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm line-clamp-2 flex-1">
           {product.description}
+        </p>
+        <p className="text-primary font-bold text-sm sm:text-base mt-2">
+          ${Number(product.price).toFixed(2)}
         </p>
         
         <div className="mt-2 flex gap-0.5">

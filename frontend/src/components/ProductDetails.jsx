@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import axios from 'axios';
@@ -11,12 +11,19 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [imageError, setImageError] = useState(false);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
+  // Using a lightweight SVG as placeholder
+  const placeholderImage = `data:image/svg+xml,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+      <rect width="400" height="400" fill="#f3f4f6"/>
+      <text x="50%" y="50%" font-family="Arial" font-size="24" fill="#9ca3af" text-anchor="middle">
+        No Image Available
+      </text>
+    </svg>
+  `)}`;
 
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/products/${id}`);
       setProduct(response.data.data);
@@ -25,6 +32,16 @@ const ProductDetails = () => {
       toast.error('Error loading product');
       navigate('/');
     }
+  }, [id, navigate]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
+
+  const handleImageError = (e) => {
+    setImageError(true);
+    e.target.src = placeholderImage;
+    e.target.onerror = null; // Prevent infinite loop
   };
 
   const handleAddToCart = () => {
@@ -45,13 +62,10 @@ const ProductDetails = () => {
         {/* Image Section */}
         <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
           <img 
-            src={product?.imageUrl || 'https://via.placeholder.com/400'} 
+            src={!imageError ? (product?.imageUrl || placeholderImage) : placeholderImage}
             alt={product?.name}
             className="w-full h-full object-contain"
-            onError={(e) => {
-              e.target.onerror = null; // Prevent infinite loop
-              e.target.src = 'https://via.placeholder.com/400';
-            }}
+            onError={handleImageError}
           />
         </div>
 
