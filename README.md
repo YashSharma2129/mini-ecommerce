@@ -1,6 +1,21 @@
-# Mini E-commerce Platform
+# Mini E-commerce Platform 
 
-A modern e-commerce platform built with MERN stack.
+A modern e-commerce platform built with MERN stack featuring a two-tab interface for product management.
+
+## Features
+
+- Two main tabs:
+  1. **Product Submission Tab**
+     - Add new products with name, price, description, and image URL
+     - Real-time form validation
+     - Instant feedback on submission
+  2. **My Products Tab**
+     - View all submitted products in a card layout
+     - Real-time updates when new products are added
+     - Smart search functionality
+- Responsive design
+- Product search with keyword matching
+- Clean and intuitive user interface
 
 ## Prerequisites
 
@@ -54,18 +69,9 @@ A modern e-commerce platform built with MERN stack.
 - **Backend**: Node.js, Express
 - **Database**: MongoDB
 - **State Management**: React Context
-- **Styling**: Tailwind CSS
 - **Form Handling**: React Hook Form
 - **Notifications**: React Hot Toast
-
-## Features
-
-- [x] Product catalog
-- [x] Shopping cart
-- [x] Checkout process
-- [x] Responsive design
-- [x] Search functionality
-- [x] Category filtering
+- **Search**: Keyword matching algorithm
 
 ## API Endpoints
 
@@ -74,7 +80,7 @@ A modern e-commerce platform built with MERN stack.
 | GET    | /api/products     | Get all products     |
 | POST   | /api/products     | Create product       |
 | GET    | /api/products/:id | Get single product   |
-| POST   | /api/orders       | Create order         |
+| GET    | /api/products/search | Search products   |
 
 ## Environment Variables
 
@@ -85,6 +91,24 @@ A modern e-commerce platform built with MERN stack.
 
 ### Frontend
 - `REACT_APP_API_URL`: Backend API URL
+
+## Project Structure
+
+```
+mini-ecommerce/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ProductForm/      # Product submission tab
+│   │   │   ├── ProductList/      # My products tab
+│   │   │   └── SearchBar/        # Search functionality
+│   │   └── ...
+├── backend/
+│   ├── routes/
+│   │   └── products.js           # Product API endpoints
+│   └── ...
+└── ...
+```
 
 ## Contributing
 
@@ -97,3 +121,14 @@ A modern e-commerce platform built with MERN stack.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## What's Working
+
+- ✅ Two-tab interface implementation
+- ✅ Product submission form with validation
+- ✅ Product listing with card layout
+- ✅ Search functionality with keyword matching
+- ✅ Real-time updates
+- ✅ Responsive design
+- ✅ MongoDB integration
+- ✅ RESTful API endpoints
