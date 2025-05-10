@@ -29,14 +29,16 @@ process.on('unhandledRejection', (err) => {
 });
 
 // Middleware
-app.use(cors({
-    origin: [
-        'https://mini-ecommerce-yash.netlify.app',
-        'https://mini-ecommerce-production.up.railway.app',
-        'http://localhost:3000'
-    ],
-    credentials: true
-}));
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production'
+        ? ['https://mini-ecommerce-yash.netlify.app']
+        : ['http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
