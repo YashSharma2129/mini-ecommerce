@@ -79,21 +79,22 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      console.log('Attempting registration...');
+      console.log('Attempting registration with URL:', `${process.env.REACT_APP_API_URL}/auth/register`);
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, userData, {
         headers: {
           'Content-Type': 'application/json',
         },
-        withCredentials: true
+        withCredentials: true,
+        timeout: 5000 // 5 second timeout
       });
-      localStorage.setItem('token', response.data.token);
-      setUser(response.data.user);
-      toast.success('Registration successful');
+      console.log('Registration response:', response.data);
       return true;
     } catch (error) {
       console.error('Registration error:', error);
-      if (error.code === 'ERR_NETWORK') {
-        toast.error('Network error - Please check your connection or disable ad blockers');
+      if (error.code === 'ERR_CONNECTION_REFUSED') {
+        toast.error('Unable to connect to server. Please ensure the backend is running.');
+      } else if (error.code === 'ECONNABORTED') {
+        toast.error('Request timed out. Please try again.');
       } else {
         toast.error(error.response?.data?.message || 'Registration failed');
       }
